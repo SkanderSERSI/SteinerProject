@@ -230,6 +230,27 @@ public class DefaultTeam {
 		}
 		return edgesAlgo;	
 	}
+	public ArrayList<Point> filtrage_sommets_extrems(ArrayList<Edge> edges){
+		ArrayList<Edge> edgesAlgo = (ArrayList<Edge>) edges.clone();
+		ArrayList<Point> points = eclatement_edges(edges);
+		ArrayList<Point> res = new ArrayList<>();
+		/*for (Point point : points) {
+			System.out.println("("+point.x+","+point.y+")");
+		}*/
+		for (Edge edge1 : edges) {
+
+			int cp1 = compter(points, edge1.p);
+			int cp2 = compter(points, edge1.q);
+			
+			if (cp1 == 1) {
+				points.remove(edge1.p);
+			}
+			if (cp2 == 1) {
+				points.remove(edge1.q);
+			}
+		}
+		return points;	
+	}
 		
 	
 	private ArrayList<Point> eclatement_edges(ArrayList<Edge> edgesAlgo) {
@@ -289,14 +310,57 @@ public class DefaultTeam {
 	   //ArrayList<Edge> best_edges_filtres = filtrage_edges_extrems(filtrage_edges_extrems(filtrage_edges_extrems(filtrage_edges_extrems(best_edges))));
 		ArrayList<Edge> best_edges_filtres = best_edges;
 		int ds = distances_total_edges(best_edges_filtres);
-		while(ds>2050){
+		while(ds>2106){
 		   best_edges_filtres = filtrage_edges_extrems(best_edges_filtres);
 		   ds = distances_total_edges(best_edges_filtres);
 		   System.out.println(" number of edges "+best_edges.size());
 		   System.out.println(" distance "+ds);;
 	   }
+		
+		ArrayList<Point> hitsPointsNew = filtrage_sommets_extrems(best_edges_filtres);
+		ArrayList<Edge> kruskaled = kruskal(hitsPointsNew, dist, mapPointIndice);
+
+		ArrayList<Edge> best_edges_new = new ArrayList<>();
+		for (Edge edge : kruskaled) {
+			Point p = edge.p;
+			Point q = edge.q;
+
+			ArrayList<Edge> edges_intermediaires = new ArrayList<>();
+
+			int i = mapPointIndice.get(p);
+			int j = mapPointIndice.get(q);
+
+			if (paths[i][j] != j) {
+
+				int k = paths[i][j];
+				edges_intermediaires
+						.add(new Edge(getKeyFromValue(mapPointIndice, i), getKeyFromValue(mapPointIndice, k)));
+				while (k != j) {
+					int k_moins = k;
+					k = paths[k][j];
+					edges_intermediaires.add(
+							new Edge(getKeyFromValue(mapPointIndice, k_moins), getKeyFromValue(mapPointIndice, k)));
+
+				}
+				edges_intermediaires
+						.add(new Edge(getKeyFromValue(mapPointIndice, k), getKeyFromValue(mapPointIndice, j)));
+				best_edges_new.addAll(edges_intermediaires);
+
+			} else {
+				best_edges_new.add(edge);
+			}
+
+		}
+		ArrayList<Edge> best_edges_filtres_new = best_edges_new;
+		int ds1 = distances_total_edges(best_edges_filtres_new);
+		while(ds1>1645){
+		   best_edges_filtres_new = filtrage_edges_extrems(best_edges_filtres_new);
+		   ds1 = distances_total_edges(best_edges_filtres_new);
+		   System.out.println(" number of edges "+best_edges_new.size());
+		   System.out.println(" distance "+ds1);;
+	   }
 	   //System.out.println(best_edges_filtres.size());
-	   return edgesToTree(best_edges_filtres, best_edges_filtres.get(0).p);
+	   return edgesToTree(best_edges_filtres_new,hitPoints.get(0));
 	  }
 
 	private int distances_total_edges(ArrayList<Edge> best_edges) {
