@@ -226,6 +226,7 @@ public class DefaultTeam {
 			if (cp1 <= 1 || cp2 <= 1) {
 				System.out.println("cp1 = " + cp1 + " cp2= " + cp2);
 				edgesAlgo.remove(edge1);
+				break;
 			}
 		}
 		return edgesAlgo;	
@@ -353,7 +354,7 @@ public class DefaultTeam {
 		}
 		ArrayList<Edge> best_edges_filtres_new = best_edges_new;
 		int ds1 = distances_total_edges(best_edges_filtres_new);
-		while(ds1>1645){
+		while(ds1>1664){
 		   best_edges_filtres_new = filtrage_edges_extrems(best_edges_filtres_new);
 		   ds1 = distances_total_edges(best_edges_filtres_new);
 		   System.out.println(" number of edges "+best_edges_new.size());
